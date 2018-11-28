@@ -12,7 +12,7 @@ import model.Transaction;
 public class TransactionController {
 	public static ArrayList<Object[]> getTransaction(String id) throws SQLException {
 		ArrayList<Object[]> transactions = new ArrayList<Object[]>();
-		String sql = "select * from transaction where idUser = ?;"; 
+		String sql = "select * from transaction where idUser = ? order by DATE;"; 
 		DatabaseConnection db = new DatabaseConnection();
 		Connection conn = null;
 		try {
@@ -29,18 +29,20 @@ public class TransactionController {
 		return transactions;
 	}
 	
-	public static int addTransaction(Transaction transaction, String idUser, String idBorrower ) throws SQLException{
+	public static int addTransaction(Transaction transaction, String idUser) throws SQLException{
 		String sql = "INSERT INTO `financial`.`transaction`\r\n" + 
 				"(`title`,\r\n" + 
 				"`description`,\r\n" + 
 				"`amount`,\r\n" + 
-				"`status`,\r\n" + 
+				"`status`,\r\n" +
+				"`date`,\r\n" + 
 				"`idUser`)\r\n" + 
 				"VALUES\r\n" + 
 				"(?,\r\n" + 
 				"?,\r\n" + 
-				"?,\r\n" + 
-				"?,\r\n" + 
+				"?,\r\n" +
+				"?,\r\n" +
+				"curdate(),\r\n" + 
 				"?);";
 		DatabaseConnection db = new DatabaseConnection();
 		Connection conn = null;
@@ -65,9 +67,11 @@ public class TransactionController {
 				"SET\r\n" + 
 				"`title` = ?,\r\n" + 
 				"`description` = ?,\r\n" + 
-				"`amount` = ?,\r\n" + 
+				"`amount` = ?,\r\n" +
+				"`date` = ?,\r\n" + 
 				"`status` = ?\r\n" + 
-				"WHERE `idTransaction` = ?;";
+				"WHERE `idTransaction` = ?"
+				+ "ORDER BY DATE;";
 		DatabaseConnection db = new DatabaseConnection();
 		Connection conn = null;
 		try {
@@ -76,16 +80,13 @@ public class TransactionController {
 			e.printStackTrace();
 		}
 		PreparedStatement ps = conn.prepareStatement(sql);
-		System.out.println(transaction.getTitle());
-		System.out.println(transaction.getDate());
-		System.out.println(transaction.getDescription());
 		System.out.println(transaction.getAmount());
-		System.out.println(transaction.getStatus());
 		ps.setString(1, transaction.getTitle());
 		ps.setString(2, transaction.getDescription());
 		ps.setDouble(3, transaction.getAmount());
-		ps.setString(4, transaction.getStatus());
-		ps.setString(5, transaction.getIdTransaction());
+		ps.setString(4, transaction.getDate());
+		ps.setString(5, transaction.getStatus());
+		ps.setString(6, transaction.getIdTransaction());
 		int updated = ps.executeUpdate();
 		conn.close();
 		return updated;

@@ -26,14 +26,14 @@ public class MainPage extends JFrame {
 	public MainPage(User user) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
-		setBounds(100, 100, 684, 344);
+		setBounds(100, 100, 736, 344);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(10, 11, 658, 288);
+		tabbedPane.setBounds(10, 11, 700, 288);
 		contentPane.add(tabbedPane);
 		
 		
