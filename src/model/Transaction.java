@@ -16,6 +16,14 @@ public class Transaction {
 		this.setDescription(description);
 		this.setIdTransaction(idTransaction);
 	}
+	
+	public Transaction(String title, String description, double amount, String date, String status) {
+		this.setAmount(amount);
+		this.setDate(date);
+		this.setTitle(title);
+		this.setStatus(status);
+		this.setDescription(description);
+	}
 
 	public String getIdTransaction() {
 		return idTransaction;

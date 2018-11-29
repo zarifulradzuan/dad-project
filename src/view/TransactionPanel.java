@@ -7,26 +7,18 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Properties;
-
 import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableModel;
-
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
-
 import controller.TransactionController;
+import controller.UserController;
 import model.Transaction;
 import net.miginfocom.swing.MigLayout;
 
@@ -34,6 +26,7 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerDateModel;
 import javax.swing.ListSelectionModel;
@@ -44,6 +37,8 @@ public class TransactionPanel extends JPanel {
 	private String id;
 	private DefaultTableModel transactionTableModel;
 	private boolean refreshing = false;
+	JLabel lblBalance = new JLabel();
+	private JPanel panel;
 	/**
 	 * Create the panel.
 	 */
@@ -75,19 +70,37 @@ public class TransactionPanel extends JPanel {
 		
 		JPanel sidePanel = new JPanel();
 		add(sidePanel, "cell 1 0,grow");
-		sidePanel.setLayout(new MigLayout("", "[]", "[][][][][][][][][][]"));
+		sidePanel.setLayout(new MigLayout("", "[grow]", "[][][][][][][][grow][][]"));
 		
 		JButton btnAddTransaction = new JButton("Add Transaction");
+		btnAddTransaction.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new AddTransaction(id);
+			}
+		});
 		sidePanel.add(btnAddTransaction, "cell 0 0,growx");
 		
 		JButton btnRemoveTransaction = new JButton("Remove Transaction");
-		sidePanel.add(btnRemoveTransaction, "cell 0 1");
+		btnRemoveTransaction.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		sidePanel.add(btnRemoveTransaction, "cell 0 1,growx");
 		
-		JLabel lblAccountBalanceTo = new JLabel("Account balance to date:");
-		sidePanel.add(lblAccountBalanceTo, "cell 0 8");
+		JButton btnRefreshTransaction = new JButton("Refresh Transaction");
+		btnRefreshTransaction.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshTable((DefaultTableModel) transactionTable.getModel());
+			}
+		});
+		sidePanel.add(btnRefreshTransaction, "cell 0 2,growx");
 		
-		JLabel lblBalance = new JLabel("balance");
-		sidePanel.add(lblBalance, "cell 0 9");
+		panel = new JPanel();
+		sidePanel.add(panel, "cell 0 9,grow");
+		panel.setLayout(new MigLayout("", "[]", "[]"));
+		
+		JLabel lblAccountBalanceTo = new JLabel("Account balance to date: RM");
+		panel.add(lblAccountBalanceTo, "flowx,cell 0 0");
 		
 		transactionTableModel = new DefaultTableModel();
 		transactionTableModel.addColumn("ID");
@@ -99,14 +112,7 @@ public class TransactionPanel extends JPanel {
 		
 		
 		
-		try {
-			for(Object[] a : TransactionController.getTransaction(this.id)) {
-				transactionTableModel.addRow(a);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		refreshTable(transactionTableModel);
 		transactionTable.setModel(transactionTableModel);
 		transactionTable.getColumnModel().getColumn(0).setPreferredWidth(27);
 		transactionTable.getColumnModel().getColumn(1).setPreferredWidth(300);
@@ -129,7 +135,7 @@ public class TransactionPanel extends JPanel {
 						transactionTable.getModel().getValueAt(e.getFirstRow(), 5).toString());
 						try {
 							TransactionController.updateTransaction(transactionUpdated, id);
-							refreshTable(this, (DefaultTableModel) transactionTable.getModel());
+							refreshTable((DefaultTableModel) transactionTable.getModel());
 						} catch (SQLException e2) {
 							e2.printStackTrace();
 						}
@@ -148,7 +154,7 @@ public class TransactionPanel extends JPanel {
 		transactionTable.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(typeOfTransaction));
 	}
 	
-	private void refreshTable(Thread thread, DefaultTableModel tableModel) {
+	private void refreshTable(DefaultTableModel tableModel) {
 		refreshing = true;
 		tableModel.setRowCount(0);
 		try {
@@ -160,61 +166,44 @@ public class TransactionPanel extends JPanel {
 			e.printStackTrace();
 		}
 		refreshing = false;
-		
-	}
-	
-	public class DateLabelFormatter extends AbstractFormatter{
-		private String datePattern = "yyyy-MM-dd";
-		private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
-		@Override
-		public Object stringToValue(String text) throws ParseException {
-			return dateFormatter.parseObject(text);
-		}
-
-		@Override
-		public String valueToString(Object value) throws ParseException {
-			if(value!=null) {
-				Calendar cal = (Calendar) value;
-				return dateFormatter.format(cal.getTime());
-			}
-			return null;
+		try {
+			panel.add(lblBalance, "cell 0 0");
+			lblBalance.setText(String.valueOf(UserController.getBalance(id)));
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, "Trouble getting balance");
+			e.printStackTrace();
 		}
 		
 	}
 	
 	public class DatePicker extends AbstractCellEditor implements TableCellEditor, ActionListener {
-		UtilDateModel model = new UtilDateModel();
-		
+		JSpinner dateInput;
 		@Override
 		public Object getCellEditorValue() {
-			String date = (model.getYear()+"-"+model.getMonth()+"-"+model.getDay());
-			return date;
+			return new SimpleDateFormat("yyyy-MM-dd").format(dateInput.getValue());		
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			java.util.Date date = null;
-			try {
-				date = new SimpleDateFormat("yyyy-MM-dd").parse(e.toString());
-			} catch (ParseException e1) {
-				// 
-				e1.printStackTrace();
-			}
-			model.setDate(date.getYear(),date.getMonth(),date.getDay());
+			
 		}
 
 		@Override
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
 				int column) {
-			Properties p = new Properties();
-			p.put("text.today","Today");
-			p.put("text.month","Month");
-			p.put("text.year","Year");
-			JDatePanelImpl datePanel = new JDatePanelImpl(model,p);
-			JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-			
-			return datePicker;
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = null;
+			try {
+				date = (dateFormatter.parse(value.toString()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			dateInput = new JSpinner();
+			dateInput.setModel(new SpinnerDateModel(new java.util.Date(), null,null, Calendar.DATE));
+			dateInput.setEditor(new JSpinner.DateEditor(dateInput,"yyyy-MM-dd"));
+			dateInput.setValue(date);
+			return dateInput;
 		}
 		
 	}

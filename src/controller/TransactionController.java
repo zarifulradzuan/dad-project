@@ -80,7 +80,6 @@ public class TransactionController {
 			e.printStackTrace();
 		}
 		PreparedStatement ps = conn.prepareStatement(sql);
-		System.out.println(transaction.getAmount());
 		ps.setString(1, transaction.getTitle());
 		ps.setString(2, transaction.getDescription());
 		ps.setDouble(3, transaction.getAmount());
