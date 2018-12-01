@@ -8,17 +8,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import controller.LoginController;
+import controller.UserController;
 import model.User;
 import net.miginfocom.swing.MigLayout;
 
 public class Login extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private User user;
 
 	public Login() {
-		user = new User();
-		setBounds(100, 100, 450, 200);
+		setBounds(100, 100, 475, 200);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new MigLayout("", "[][][][][grow][][][][grow][][][][]", "[][][][][][][][]"));
@@ -39,19 +37,28 @@ public class Login extends JFrame {
 		JPasswordField fieldPassword = new JPasswordField();
 		getContentPane().add(fieldPassword, "cell 7 4,growx");
 		
-		JButton btnLogin = new JButton("LOGIN");
-		LoginController loginController = new LoginController(user);
-		getContentPane().add(btnLogin, "cell 9 7");
+		JButton btnLogin = new JButton("LOGIN");	
+		getContentPane().add(btnLogin, "cell 9 7,growx");
 		
 		JLabel lblIncorrect = new JLabel("Incorrect username or password entered");
 		lblIncorrect.setVisible(false);
+		
+		JButton btnRegister = new JButton("REGISTER");
+		btnRegister.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Register();
+			}
+		});
+		getContentPane().add(btnRegister, "cell 9 8,growx");
 		getContentPane().add(lblIncorrect, "cell 7 9");
 		
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					if(loginController.doLogin(fieldUsername.getText(), fieldPassword.getPassword())) {
-						new MainPage(loginController.getUser());
+					User user = null;
+					user = UserController.searchUser(fieldUsername.getText(), fieldPassword.getPassword());
+					if(user!=null) {
+						new MainPage(user);
 						dispose();
 					}
 					else

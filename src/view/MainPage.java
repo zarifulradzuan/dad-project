@@ -1,8 +1,5 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -10,8 +7,11 @@ import javax.swing.border.EmptyBorder;
 import model.User;
 
 import javax.swing.JTabbedPane;
-import javax.swing.JScrollPane;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
+@SuppressWarnings("serial")
 public class MainPage extends JFrame {
 
 	private JPanel contentPane;
@@ -26,7 +26,7 @@ public class MainPage extends JFrame {
 	public MainPage(User user) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
-		setBounds(100, 100, 736, 344);
+		setBounds(100, 100, 736, 374);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -40,5 +40,14 @@ public class MainPage extends JFrame {
 		
 		TransactionPanel transactionPanel = new TransactionPanel(user.getUserID());
 		tabbedPane.addTab("Transactions", null, transactionPanel, null);
+		JButton btnLogout = new JButton("Logout");
+		btnLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				new Main();
+			}
+		});
+		btnLogout.setBounds(10, 302, 89, 23);
+		contentPane.add(btnLogout);
 	}
 }

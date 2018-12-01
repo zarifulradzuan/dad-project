@@ -3,7 +3,6 @@ package view;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,6 +16,9 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+
+import org.json.JSONException;
+
 import controller.TransactionController;
 import controller.UserController;
 import model.Transaction;
@@ -45,7 +47,7 @@ public class TransactionPanel extends JPanel {
 	public TransactionPanel(String id) {
 		this.id = id;
 		setLayout(new MigLayout("", "[381.00,grow][108.00,grow]", "[grow][]"));
-		
+		TransactionPanel tp = this;
 		JScrollPane tableScrollPane = new JScrollPane();
 		tableScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		tableScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -75,7 +77,7 @@ public class TransactionPanel extends JPanel {
 		JButton btnAddTransaction = new JButton("Add Transaction");
 		btnAddTransaction.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new AddTransaction(id);
+				new AddTransaction(id, tp);
 			}
 		});
 		sidePanel.add(btnAddTransaction, "cell 0 0,growx");
@@ -83,6 +85,20 @@ public class TransactionPanel extends JPanel {
 		JButton btnRemoveTransaction = new JButton("Remove Transaction");
 		btnRemoveTransaction.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(transactionTable.getSelectedRow()>=0) {
+					String id = transactionTable.getModel().getValueAt(transactionTable.getSelectedRow(), 0).toString();
+					int confirmation = JOptionPane.showConfirmDialog(null,"Delete this transaction?","Delete transaction",JOptionPane.YES_NO_OPTION);
+					if(confirmation==0)
+						try {
+							TransactionController.removeTransaction(id);
+						} catch (JSONException e1) {
+							JOptionPane.showMessageDialog(null, "Unable to remove transaction", "Error", JOptionPane.ERROR_MESSAGE);
+							e1.printStackTrace();
+						}
+					refreshTable();
+				}
+				else
+					JOptionPane.showMessageDialog(null, "No transaction selected");
 			}
 		});
 		sidePanel.add(btnRemoveTransaction, "cell 0 1,growx");
@@ -90,7 +106,7 @@ public class TransactionPanel extends JPanel {
 		JButton btnRefreshTransaction = new JButton("Refresh Transaction");
 		btnRefreshTransaction.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				refreshTable((DefaultTableModel) transactionTable.getModel());
+				refreshTable();
 			}
 		});
 		sidePanel.add(btnRefreshTransaction, "cell 0 2,growx");
@@ -112,7 +128,7 @@ public class TransactionPanel extends JPanel {
 		
 		
 		
-		refreshTable(transactionTableModel);
+		refreshTable();
 		transactionTable.setModel(transactionTableModel);
 		transactionTable.getColumnModel().getColumn(0).setPreferredWidth(27);
 		transactionTable.getColumnModel().getColumn(1).setPreferredWidth(300);
@@ -134,11 +150,12 @@ public class TransactionPanel extends JPanel {
 						transactionTable.getModel().getValueAt(e.getFirstRow(), 4).toString(),
 						transactionTable.getModel().getValueAt(e.getFirstRow(), 5).toString());
 						try {
-							TransactionController.updateTransaction(transactionUpdated, id);
-							refreshTable((DefaultTableModel) transactionTable.getModel());
-						} catch (SQLException e2) {
-							e2.printStackTrace();
+						TransactionController.updateTransaction(transactionUpdated);
+						}catch(JSONException e) {
+							JOptionPane.showMessageDialog(null, "Unable to update transaction", "Error", JOptionPane.WARNING_MESSAGE);
+							e.printStackTrace();
 						}
+						refreshTable();
 					}
 				};
 				if(!refreshing)
@@ -154,22 +171,21 @@ public class TransactionPanel extends JPanel {
 		transactionTable.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(typeOfTransaction));
 	}
 	
-	private void refreshTable(DefaultTableModel tableModel) {
+	public void refreshTable() {
 		refreshing = true;
-		tableModel.setRowCount(0);
+		transactionTableModel.setRowCount(0);
 		try {
-			for(Object[] a : TransactionController.getTransaction(this.id)) {
-				tableModel.addRow(a);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			for(Object[] a : TransactionController.getTransaction(this.id)) 
+				transactionTableModel.addRow(a);
+		} catch (JSONException e1) {
+			JOptionPane.showMessageDialog(null, "Unable to get transaction", "Error", JOptionPane.ERROR_MESSAGE);
+			e1.printStackTrace();
 		}
 		refreshing = false;
 		try {
 			panel.add(lblBalance, "cell 0 0");
-			lblBalance.setText(String.valueOf(UserController.getBalance(id)));
-		} catch (SQLException e) {
+			lblBalance.setText(String.format("%.2f", UserController.getBalance(id)));
+		} catch (JSONException e) {
 			JOptionPane.showMessageDialog(null, "Trouble getting balance");
 			e.printStackTrace();
 		}

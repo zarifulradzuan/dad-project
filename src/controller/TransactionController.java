@@ -1,93 +1,66 @@
 package controller;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-import database.DatabaseConnection;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import database.MakeHttpRequest;
 import model.Transaction;
 
 public class TransactionController {
-	public static ArrayList<Object[]> getTransaction(String id) throws SQLException {
+	public static ArrayList<Object[]> getTransaction(String id) throws JSONException {
 		ArrayList<Object[]> transactions = new ArrayList<Object[]>();
-		String sql = "select * from transaction where idUser = ? order by DATE;"; 
-		DatabaseConnection db = new DatabaseConnection();
-		Connection conn = null;
-		try {
-			conn = db.getConnection();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		PreparedStatement ps = conn.prepareStatement(sql);
-		ps.setString(1, id);
-		ResultSet rs = ps.executeQuery();
-		while(rs.next()) 
-			transactions.add(new Object[] {rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6)});
-		conn.close();
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "getTransaction"));
+		params.add(new BasicNameValuePair("idUser", id));
+		JSONArray jArr = MakeHttpRequest.makeRequest(params,"transaction");
+		for(int i = 0; i<jArr.length();i++)
+			try {
+				transactions.add(new Object[] {jArr.getJSONObject(i).getString("idTransaction"),
+						jArr.getJSONObject(i).getString("title"),
+						jArr.getJSONObject(i).getString("description"),
+						String.format("%.2f", jArr.getJSONObject(i).getDouble("amount")),
+						jArr.getJSONObject(i).getString("date"),
+						jArr.getJSONObject(i).getString("status")});
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		return transactions;
 	}
 	
-	public static int addTransaction(Transaction transaction, String idUser) throws SQLException{
-		String sql = "INSERT INTO `financial`.`transaction`\r\n" + 
-				"(`title`,\r\n" + 
-				"`description`,\r\n" + 
-				"`amount`,\r\n" + 
-				"`status`,\r\n" +
-				"`date`,\r\n" + 
-				"`idUser`)\r\n" + 
-				"VALUES\r\n" + 
-				"(?,\r\n" + 
-				"?,\r\n" + 
-				"?,\r\n" +
-				"?,\r\n" +
-				"curdate(),\r\n" + 
-				"?);";
-		DatabaseConnection db = new DatabaseConnection();
-		Connection conn = null;
-		try {
-			conn = db.getConnection();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		PreparedStatement ps = conn.prepareStatement(sql);
-		ps.setString(1, transaction.getTitle());
-		ps.setString(2, transaction.getDescription());
-		ps.setDouble(3, transaction.getAmount());
-		ps.setString(4, transaction.getStatus());
-		ps.setString(5, idUser);
-		int inserted = ps.executeUpdate();
-		conn.close();
-		return inserted;
+	public static void addTransaction(Transaction transaction, String idUser) throws JSONException{
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "addTransaction"));
+		params.add(new BasicNameValuePair("idUser", idUser));
+		params.add(new BasicNameValuePair("title", transaction.getTitle()));
+		params.add(new BasicNameValuePair("description", transaction.getDescription()));
+		params.add(new BasicNameValuePair("amount", String.valueOf(transaction.getAmount())));
+		params.add(new BasicNameValuePair("status", transaction.getStatus()));
+		
+		MakeHttpRequest.makeRequest(params, "transaction");
 	}
 	
-	public static int updateTransaction(Transaction transaction, String id) throws SQLException {
-		String sql="UPDATE `financial`.`transaction`\r\n" + 
-				"SET\r\n" + 
-				"`title` = ?,\r\n" + 
-				"`description` = ?,\r\n" + 
-				"`amount` = ?,\r\n" +
-				"`date` = ?,\r\n" + 
-				"`status` = ?\r\n" + 
-				"WHERE `idTransaction` = ?"
-				+ "ORDER BY DATE;";
-		DatabaseConnection db = new DatabaseConnection();
-		Connection conn = null;
-		try {
-			conn = db.getConnection();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		PreparedStatement ps = conn.prepareStatement(sql);
-		ps.setString(1, transaction.getTitle());
-		ps.setString(2, transaction.getDescription());
-		ps.setDouble(3, transaction.getAmount());
-		ps.setString(4, transaction.getDate());
-		ps.setString(5, transaction.getStatus());
-		ps.setString(6, transaction.getIdTransaction());
-		int updated = ps.executeUpdate();
-		conn.close();
-		return updated;
+	public static void removeTransaction(String id) throws JSONException  {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "deleteTransaction"));
+		params.add(new BasicNameValuePair("idTransaction", id));
+		MakeHttpRequest.makeRequest(params, "transaction");
+	}
+	
+	public static void updateTransaction(Transaction transaction) throws JSONException {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "updateTransaction"));
+		params.add(new BasicNameValuePair("idTransaction", transaction.getIdTransaction()));
+		params.add(new BasicNameValuePair("title", transaction.getTitle()));
+		params.add(new BasicNameValuePair("description", transaction.getDescription()));
+		params.add(new BasicNameValuePair("amount", String.valueOf(transaction.getAmount())));
+		params.add(new BasicNameValuePair("status", transaction.getStatus()));
+		params.add(new BasicNameValuePair("date", transaction.getDate()));
+		MakeHttpRequest.makeRequest(params, "transaction");
 	}
 }

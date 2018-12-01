@@ -7,6 +7,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.border.EmptyBorder;
 
+import org.json.JSONException;
+
 import controller.TransactionController;
 import model.Transaction;
 import javax.swing.JLabel;
@@ -17,7 +19,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
@@ -28,7 +29,7 @@ public class AddTransaction extends JFrame {
 	private JTextField txtDetails;
 	private JTextField txtAmount;
 	//private SpringLayout springLayout;
-	public AddTransaction(String idUser) {
+	public AddTransaction(String idUser, TransactionPanel tp) {
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 298, 300);
@@ -104,8 +105,9 @@ public class AddTransaction extends JFrame {
 						try {
 							TransactionController.addTransaction(newTransaction, idUser);
 							JOptionPane.showMessageDialog(null, "Succcessfully added");
+							tp.refreshTable();
 							dispose();
-						} catch (SQLException e) {
+						} catch (JSONException e) {
 							JOptionPane.showMessageDialog(null, "Failed to add");
 							e.printStackTrace();
 						}
