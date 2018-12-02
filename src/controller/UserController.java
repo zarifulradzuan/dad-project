@@ -31,7 +31,7 @@ public class UserController {
 			return null;
 	}
 	
-	public static boolean checkValid(String parameter,String toCheck) throws JSONException{
+	public static int checkValid(String parameter,String toCheck) throws JSONException{
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("selectFn", "checkValid"));
 		if(parameter.equals("username"))
@@ -39,15 +39,29 @@ public class UserController {
 		else
 			params.add(new BasicNameValuePair("email", toCheck));
 		JSONArray jArr = MakeHttpRequest.makeRequest(params, "user");
-		if(jArr.length()==0)
-			return false;
+		
+		int exist = jArr.getJSONObject(0).getInt("exist");
+		int isPhantom;
+		if(parameter.equals("email")) {
+			 isPhantom = jArr.getJSONObject(0).getInt("isPhantom");
+			 if(isPhantom==1)
+				 return 2;
+		}
+		if(exist==1)
+			return 0;
 		else
-			return true;
+			return 1;
 	}
 	
-	public static void registerUser(String username, String password, String email) throws JSONException {
+	public static void registerUser(String username, String password, String email, boolean isPhantom) throws JSONException {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("selectFn", "registerUser"));
+		System.out.println(isPhantom);
+		if(isPhantom) {
+			params.add(new BasicNameValuePair("selectFn", "registerPhantom"));
+			System.out.println("registering phantom user");
+		}
+		else
+			params.add(new BasicNameValuePair("selectFn", "registerUser"));
 		params.add(new BasicNameValuePair("username", username));
 		params.add(new BasicNameValuePair("password", password));
 		params.add(new BasicNameValuePair("email", email));

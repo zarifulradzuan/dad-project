@@ -29,8 +29,10 @@ public class Register {
 	private JLabel lblEmailCheck;
 	private JButton btnRegister;
 	private JTextField txtEmail;
+	private boolean isPhantom;
 	
 	public Register() {
+		isPhantom=false;
 		initialize();
 	}
 
@@ -57,7 +59,8 @@ public class Register {
 				Thread checkExisting = new Thread() {
 					public void run() {
 						try {
-							if(UserController.checkValid("username",txtUsername.getText())) {
+							int checkValidity = UserController.checkValid("username",txtUsername.getText());
+							if(checkValidity==0) {
 								lblUsernameCheck.setText("x");
 								lblUsernameCheck.setForeground(Color.RED);
 							}
@@ -147,7 +150,7 @@ public class Register {
 				Thread registerUser = new Thread() {
 					public void run() {
 						try {
-							UserController.registerUser(txtUsername.getText(), pwdPassword.getText(), txtEmail.getText());
+							UserController.registerUser(txtUsername.getText(), pwdPassword.getText(), txtEmail.getText(),isPhantom);
 							JOptionPane.showMessageDialog(null, "Successfully registered.");
 							frame.dispose();
 						} catch (JSONException e) {
@@ -175,7 +178,8 @@ public class Register {
 				Thread checkExisting = new Thread() {
 					public void run() {
 						try {
-							if(UserController.checkValid("email",txtEmail.getText())) {
+							int checkValidity = UserController.checkValid("email",txtEmail.getText());
+							if(checkValidity==0) {
 								lblEmailCheck.setText("x");
 								lblEmailCheck.setForeground(Color.RED);
 							}
@@ -183,6 +187,10 @@ public class Register {
 								lblEmailCheck.setText("\u2713");
 								lblEmailCheck.setForeground(Color.GREEN);
 							}
+							if(checkValidity==2) 
+								isPhantom=true;
+							else 
+								isPhantom=false;
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -197,6 +205,7 @@ public class Register {
 		txtEmail.setBounds(156, 125, 108, 20);
 		frame.getContentPane().add(txtEmail);
 		txtEmail.setColumns(10);
+		
 	}
 	
 	void checkRegisterValid() {

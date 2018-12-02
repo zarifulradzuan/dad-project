@@ -46,8 +46,9 @@ public class MakeHttpRequest {
 			e.printStackTrace();
 		}
 		json = sb.toString();
+		System.out.println(json);
 		jArr = new JSONArray(json);
-			
+		
 		
 		return jArr;
 	}
