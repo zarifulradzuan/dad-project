@@ -49,5 +49,8 @@ public class MainPage extends JFrame {
 		});
 		btnLogout.setBounds(10, 302, 89, 23);
 		contentPane.add(btnLogout);
+		
+		OwePanel owePanel = new OwePanel(user.getUserID());
+		tabbedPane.addTab("Owe", owePanel);
 	}
 }

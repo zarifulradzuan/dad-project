@@ -68,6 +68,16 @@ public class UserController {
 		MakeHttpRequest.makeRequest(params, "user");
 	}
 	
+	public static ArrayList<String> getAllUsers() throws JSONException {
+		ArrayList<String> name = new ArrayList<String>();
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "getAllUsers"));
+		JSONArray jArr = MakeHttpRequest.makeRequest(params, "user");
+		for(int i = 0;i <jArr.length();i++)
+			name.add(jArr.getJSONObject(i).getString("username"));
+		return name;
+	}
+	
 	public static double getBalance(String id) throws JSONException {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("selectFn", "getBalance"));
