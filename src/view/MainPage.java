@@ -24,16 +24,17 @@ public class MainPage extends JFrame {
 	 * Create the frame.
 	 */
 	public MainPage(User user) {
+		this.setTitle("Financial Manager");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
-		setBounds(100, 100, 736, 374);
+		setBounds(100, 100, 736, 404);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(10, 11, 700, 288);
+		tabbedPane.setBounds(10, 11, 700, 309);
 		contentPane.add(tabbedPane);
 		
 		
@@ -47,10 +48,11 @@ public class MainPage extends JFrame {
 				new Main();
 			}
 		});
-		btnLogout.setBounds(10, 302, 89, 23);
+		btnLogout.setBounds(10, 331, 89, 23);
 		contentPane.add(btnLogout);
 		
 		OwePanel owePanel = new OwePanel(user.getUserID());
 		tabbedPane.addTab("Owe", owePanel);
+		repaint();
 	}
 }

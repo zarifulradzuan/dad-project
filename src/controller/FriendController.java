@@ -20,13 +20,13 @@ public class FriendController {
 		
 		for(int i = 0; i<jArr.length();i++)
 			try {
-				friends.add(new Object[] {jArr.getJSONObject(i).getString("idUser"),
-						jArr.getJSONObject(i).getString("username"),
-						jArr.getJSONObject(i).getString("email")});
+				friends.add(new Object[] {	jArr.getJSONObject(i).getString("idUser"),
+											jArr.getJSONObject(i).getString("username"),
+											jArr.getJSONObject(i).getString("email")});
 			} catch (JSONException e) {
-				friends.add(new Object[] {jArr.getJSONObject(i).getString("idUser"),
-						"Friend not yet registered",
-						jArr.getJSONObject(i).getString("email")});
+				friends.add(new Object[] {	jArr.getJSONObject(i).getString("idUser"),
+											"Friend not yet registered",
+											jArr.getJSONObject(i).getString("email")});
 			}
 		
 		return friends;

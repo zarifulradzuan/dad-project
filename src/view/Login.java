@@ -6,8 +6,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import org.json.JSONException;
+
 import controller.UserController;
 import model.User;
 import net.miginfocom.swing.MigLayout;
@@ -54,19 +58,24 @@ public class Login extends JFrame {
 		
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					User user = null;
-					user = UserController.searchUser(fieldUsername.getText(), fieldPassword.getPassword());
-					if(user!=null) {
-						new MainPage(user);
-						dispose();
+				Thread loginThread = new Thread() {
+					public void run() {
+						try {
+							User user = null;
+							user = UserController.searchUser(fieldUsername.getText(), fieldPassword.getPassword());
+							if(user!=null) {
+								new MainPage(user);
+								dispose();
+							}
+							else
+								lblIncorrect.setVisible(true);
+						} catch (JSONException e) {
+							JOptionPane.showMessageDialog(null, "Unable to login, check connection", "Error", JOptionPane.ERROR_MESSAGE);
+							e.printStackTrace();
+						}
 					}
-					else
-						lblIncorrect.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
+				};
+				loginThread.start();
 			}
 		});
 	}

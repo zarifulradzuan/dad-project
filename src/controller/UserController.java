@@ -13,7 +13,7 @@ import database.MakeHttpRequest;
 import model.User;
 
 public class UserController {
-	public static User searchUser(String username, char[] passwordChar) throws Exception {
+	public static User searchUser(String username, char[] passwordChar) throws JSONException {
 		String password = "";
 		for(char a: passwordChar)
 			password+=a;

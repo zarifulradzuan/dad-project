@@ -14,85 +14,57 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
 
-public class OweController {
+import database.MakeHttpRequest;
 
-	public OweController() {
-		// TODO Auto-generated constructor stub
-		
+public class OweController {	
+	public static void addRecord(String borrower, String lender, String amount, String detail) throws JSONException {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "addRecord"));
+		params.add(new BasicNameValuePair("idBorrower", borrower));
+		params.add(new BasicNameValuePair("idLender", lender));
+		params.add(new BasicNameValuePair("amount", amount));
+		params.add(new BasicNameValuePair("detail", detail));
+		MakeHttpRequest.makeRequest(params, "owe");
 	}
 	
-	
-	public void addOwe(String name, String amount, String user) {
-		Thread sr = new Thread(new SendRequest(name, amount, user));
-		sr.start();
+	public static void deleteRecord(String idOwe) throws JSONException {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "deleteRecord"));
+		params.add(new BasicNameValuePair("idOwe", idOwe));
+		MakeHttpRequest.makeRequest(params, "owe");
 	}
 	
-	public boolean addOwed() {
-		
-		return false;
+	public static ArrayList<Object[]> getRecord(String idUser, String function) throws JSONException {
+		ArrayList<Object[]> record = new ArrayList<Object[]>();
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", function));
+		params.add(new BasicNameValuePair("idUser", idUser));
+		JSONArray jArr = MakeHttpRequest.makeRequest(params, "owe");
+		if(jArr.length()!=0)
+			for(int i = 0; i<jArr.length();i++)
+				record.add(new Object[] {	jArr.getJSONObject(i).getInt("idOwe"),
+										jArr.getJSONObject(i).getInt("idOtherParty"),
+										jArr.getJSONObject(i).getString("detail"),
+										jArr.getJSONObject(i).getString("status"),
+										jArr.getJSONObject(i).getDouble("amount"),
+										jArr.getJSONObject(i).getString("date")});
+		return record;
 	}
-
-	public class SendRequest implements Runnable {
-		private String name;
-		private String amount;
-		private String user;
+	
+	public static void updateRecord(String idOwe, String idOtherParty,String detail, String status, double amount, String date, String function) throws JSONException {
+		ArrayList<Object[]> record = new ArrayList<Object[]>();
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", function));
+		params.add(new BasicNameValuePair("idOwe", idOwe));
+		params.add(new BasicNameValuePair("idOtherParty", idOtherParty));
+		params.add(new BasicNameValuePair("detail", detail));
+		params.add(new BasicNameValuePair("status", status));
+		params.add(new BasicNameValuePair("amount", String.valueOf(amount)));
+		params.add(new BasicNameValuePair("date", date));
 		
-		public SendRequest(String name, String amount, String user) {
-			this.name = name;
-			this.amount = amount;
-			this.user = user;
-		}
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("borrowerName", user));
-			params.add(new BasicNameValuePair("lenderName", name));
-			params.add(new BasicNameValuePair("amount", amount));
-			System.out.println(name + user + amount); 
-			String strUrl = "http://localhost/Dad-project/Owe.php";
-			
-			
-			
-						
-			boolean result = makeHttpRequest(strUrl, "POST", params);
-			
-			// if result true make a noti box
-		}
-
-		private boolean makeHttpRequest(String url, String string, List<NameValuePair> params) {
-			// TODO Auto-generated method stub
-			
-			
-			try {
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpPost httpPost = new HttpPost(url);
-				httpPost.setEntity(new UrlEncodedFormEntity(params));
-				HttpResponse httpResponse = httpClient.execute(httpPost);
-				HttpEntity httpEntity = httpResponse.getEntity();
-				System.out.println("\nSending 'POST' request to URL : " + url);
-				System.out.println("Post parameters : " + httpPost.getEntity());
-				System.out.println("Response Code : " + httpResponse.getStatusLine().getStatusCode());
-				
-				if(httpResponse.getStatusLine().getStatusCode() == 200) {
-					return true;
-				}
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			return false;
-			
-		}
-		
+		MakeHttpRequest.makeRequest(params, "owe");
 	}
 }

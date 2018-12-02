@@ -20,12 +20,12 @@ public class TransactionController {
 		JSONArray jArr = MakeHttpRequest.makeRequest(params,"transaction");
 		for(int i = 0; i<jArr.length();i++)
 			try {
-				transactions.add(new Object[] {jArr.getJSONObject(i).getString("idTransaction"),
-						jArr.getJSONObject(i).getString("title"),
-						jArr.getJSONObject(i).getString("description"),
-						String.format("%.2f", jArr.getJSONObject(i).getDouble("amount")),
-						jArr.getJSONObject(i).getString("date"),
-						jArr.getJSONObject(i).getString("status")});
+				transactions.add(new Object[] {	jArr.getJSONObject(i).getString("idTransaction"),
+												jArr.getJSONObject(i).getString("title"),
+												jArr.getJSONObject(i).getString("description"),
+												String.format("%.2f", jArr.getJSONObject(i).getDouble("amount")),
+												jArr.getJSONObject(i).getString("date"),
+												jArr.getJSONObject(i).getString("status")});
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

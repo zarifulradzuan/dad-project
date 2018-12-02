@@ -26,8 +26,11 @@ public class FriendManager extends JFrame {
 	private JTable friendTable;
 	private DefaultTableModel friendTableModel;
 	private String idUser;
-	public FriendManager(String id) {
+	private OwePanel owePanel;
+	
+	public FriendManager(String id, OwePanel owePanel) {
 		FriendManager fManager = this;
+		this.owePanel = owePanel;
 		this.setVisible(true);
 		idUser = id;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -81,6 +84,10 @@ public class FriendManager extends JFrame {
 			JOptionPane.showMessageDialog(null, "Unable to get friends", "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
+	}
+	
+	public OwePanel getOwePanel() {
+		return owePanel;
 	}
 
 }

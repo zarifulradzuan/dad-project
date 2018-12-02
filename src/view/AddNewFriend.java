@@ -47,6 +47,7 @@ public class AddNewFriend extends JFrame {
 						FriendController.addFriend(idUser, UserController.getByEmail(txtEmail.getText()).getUserID());
 						JOptionPane.showMessageDialog(null, "Added friend");
 						fManager.refreshTable();
+						fManager.getOwePanel().refreshFriends();
 						dispose();
 					} catch (JSONException e1) {
 						JOptionPane.showMessageDialog(null, "Unable to add friend", "Error", JOptionPane.ERROR_MESSAGE);
@@ -58,6 +59,7 @@ public class AddNewFriend extends JFrame {
 						FriendController.addFriend(idUser, UserController.getByEmail(txtEmail.getText()).getUserID());
 						JOptionPane.showMessageDialog(null, "Added friend");
 						fManager.refreshTable();
+						fManager.getOwePanel().refreshFriends();
 						dispose();
 					} catch (JSONException e1) {
 						JOptionPane.showMessageDialog(null, "Unable to add friend", "Error", JOptionPane.ERROR_MESSAGE);
