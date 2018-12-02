@@ -14,7 +14,7 @@ public class DatabaseConnection {
 		connectionURL = "jdbc:mysql://localhost/";
 		dbName = "financial";
 		username = "root";
-		password = "";
+		password = "password";
 	}
 	public Connection getConnection() throws ClassNotFoundException, SQLException {
 		Class.forName(driver);

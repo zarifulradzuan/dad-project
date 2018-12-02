@@ -40,5 +40,8 @@ public class MainPage extends JFrame {
 		
 		TransactionPanel transactionPanel = new TransactionPanel(user.getUserID());
 		tabbedPane.addTab("Transactions", null, transactionPanel, null);
+		
+		OwePanel owePanel = new OwePanel(user.getUserID());
+		tabbedPane.addTab("Owe", owePanel);
 	}
 }
