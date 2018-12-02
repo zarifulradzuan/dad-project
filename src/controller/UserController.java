@@ -31,6 +31,23 @@ public class UserController {
 			return null;
 	}
 	
+	public static User getByEmail(String email) throws JSONException{
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "getByEmail"));
+		params.add(new BasicNameValuePair("email", email));
+		JSONArray jArr = MakeHttpRequest.makeRequest(params, "user");
+		if(jArr.length()!=0) {
+			JSONObject user = jArr.getJSONObject(0);
+			try {
+				return new User(user.getString("idUser"),user.getString("username"),user.getString("password"), user.getString("email"));
+			}catch(JSONException e) {
+				return new User(user.getString("idUser"),null,null, user.getString("email"));
+			}
+		}
+		else 
+			return null;
+	}
+	
 	public static int checkValid(String parameter,String toCheck) throws JSONException{
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("selectFn", "checkValid"));
@@ -68,6 +85,13 @@ public class UserController {
 		MakeHttpRequest.makeRequest(params, "user");
 	}
 	
+	public static void newPhantom(String email) throws JSONException {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("selectFn", "newPhantom"));
+		params.add(new BasicNameValuePair("email", email));
+		MakeHttpRequest.makeRequest(params, "user");
+	}
+	
 	public static ArrayList<String> getAllUsers() throws JSONException {
 		ArrayList<String> name = new ArrayList<String>();
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -90,8 +114,7 @@ public class UserController {
 			amount=jArr.getJSONObject(0).getDouble("CREDITDEBIT");
 			amount-=jArr.getJSONObject(1).getDouble("CREDITDEBIT");
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return 0;
 		}
 		return amount;
 	}

@@ -1,10 +1,6 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -16,7 +12,6 @@ import org.json.JSONException;
 
 import controller.OweController;
 import controller.UserController;
-import model.User;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -94,9 +89,7 @@ public class AddOwe extends JFrame {
 		JButton btnSubmit = new JButton("Submit");
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println(owner);
 				oweController.addOwe(lenderTxtField.getText().toString(), AmountTxtField.getText().toString(), owner);
-				
 			}
 		});
 		btnSubmit.setBounds(107, 64, 116, 25);

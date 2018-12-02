@@ -11,14 +11,14 @@ import javax.swing.JScrollPane;
 
 public class OwePanel extends JPanel {
 	private DefaultTableModel  oweTableModel;
-	private String owner;
+	private String idUser;
 	private JTable oweOwedList;
 
 	/**
 	 * Create the panel.
 	 */
-	public OwePanel(String owener) {
-		this.owner = owener;
+	public OwePanel(String idUser) {
+		this.idUser = idUser;
 		setLayout(null);
 		
 		JPanel panel = new JPanel();
@@ -41,7 +41,7 @@ public class OwePanel extends JPanel {
 		panel_2.add(btnAddOwed);
 		btnAddOwed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new AddOwed(owner);
+				new AddOwed(idUser);
 			}
 		});
 		
@@ -61,9 +61,18 @@ public class OwePanel extends JPanel {
 			});
 			btnRemove.setBounds(0, 76, 134, 25);
 			panel_2.add(btnRemove);
+			
+			JButton btnFriends = new JButton("Friends");
+			btnFriends.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					new FriendManager(idUser);
+				}
+			});
+			btnFriends.setBounds(454, 134, 89, 23);
+			add(btnFriends);
 			btnAddOwe.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					new AddOwe(owner);
+					new AddOwe(idUser);
 				}
 			});
 
