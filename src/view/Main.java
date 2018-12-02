@@ -14,7 +14,8 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					new Main();
+					Main window = new Main();
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -34,7 +35,6 @@ public class Main {
 	 */
 	private void initialize() {
 		frame = new Login();
-		frame.setVisible(true);
 	}
 
 }
